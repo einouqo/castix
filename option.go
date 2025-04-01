@@ -2,7 +2,7 @@ package cool
 
 type Option interface {
 	apply(*control)
-} 
+}
 
 func WithDrain() Option {
 	return funcOption{
