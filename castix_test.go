@@ -53,7 +53,7 @@ func TestCastix(t *testing.T) {
                                 t.Error("channel is closed")
                             }
                             if r != msg {
-                                t.Errorf("reverived wrong message (want: %d, got: %d)", msg, r)
+                                t.Errorf("received wrong message (want: %d, got: %d)", msg, r)
                             }
                         }
                     }(ch, cancel)
