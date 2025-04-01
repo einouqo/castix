@@ -15,10 +15,6 @@ func (ctr *control) init(done <-chan struct{}) *control {
     return ctr
 }
 
-func (ctr *control) cleanup() {
-    ctr.done = nil
-}
-
 type Castix[T any] struct {
     mu   sync.Mutex
     subs map[chan T]*control
@@ -51,10 +47,14 @@ func (x *Castix[T]) Notify(msg T) {
         select {
         case <-ctr.done:
             close(ch)
-            ctr.cleanup()
             delete(x.subs, ch)
             continue
         default:
+        }
+
+        if !ctr.drain {
+            ch <- msg
+            continue
         }
 
         select {
@@ -63,9 +63,10 @@ func (x *Castix[T]) Notify(msg T) {
         default:
         }
 
-        if ctr.drain {
-            <-ch
+        select {
+        case ch <- msg:
+        case <-ch:
+            ch <- msg
         }
-        ch <- msg
     }
 }
