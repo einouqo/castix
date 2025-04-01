@@ -87,7 +87,7 @@ func TestCastix(t *testing.T) {
         x.Notify(0)
 
         if msg := <-ch; msg != last {
-            t.Errorf("last message shoulf be %d but got %d", last, msg)
+            t.Errorf("last message should be %d but got %d", last, msg)
         }
         if _, ok := <-ch; ok {
             t.Errorf("subscribe channel should be closed after cancel and read last")
