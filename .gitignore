@@ -1,0 +1,4 @@
+# Exclude IDE-specific directories
+.vscode/
+.fleet/
+.idea/
