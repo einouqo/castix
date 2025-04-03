@@ -1,57 +1,49 @@
 package castix
 
-import (
-    "context"
-    "sync"
-)
+import "sync"
 
 type control struct {
-    done  <-chan struct{}
     drain bool
 }
 
-func (ctr *control) init(done <-chan struct{}) *control {
-    ctr.done, ctr.drain = done, false
-    return ctr
-}
-
 type Castix[T any] struct {
-    mu   sync.Mutex
-    subs map[chan T]*control
+    mu   sync.RWMutex
+    subs map[chan T]control
 }
 
 func New[T any]() *Castix[T] {
     return &Castix[T]{
-        subs: make(map[chan T]*control),
+        subs: make(map[chan T]control),
     }
 }
 
-func (x *Castix[T]) C(ctx context.Context, opts ...Option) <-chan T {
+type Cancel func()
+
+func (x *Castix[T]) C(opts ...Option) (<-chan T, Cancel) {
     ch := make(chan T, 1)
-    ctr := new(control).init(ctx.Done())
+    ctr := control{}
     for _, opt := range opts {
-        opt.apply(ctr)
+        opt.apply(&ctr)
     }
 
     x.mu.Lock()
     x.subs[ch] = ctr
     x.mu.Unlock()
 
-    return ch
+    return ch, func() {
+        x.mu.Lock()
+        defer x.mu.Unlock()
+        if _, hit := x.subs[ch]; hit {
+            close(ch)
+            delete(x.subs, ch)
+        }
+    }
 }
 
 func (x *Castix[T]) Notify(msg T) {
-    x.mu.Lock()
-    defer x.mu.Unlock()
+    x.mu.RLock()
+    defer x.mu.RUnlock()
     for ch, ctr := range x.subs {
-        select {
-        case <-ctr.done:
-            close(ch)
-            delete(x.subs, ch)
-            continue
-        default:
-        }
-
         if !ctr.drain {
             ch <- msg
             continue

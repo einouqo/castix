@@ -6,9 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 permissions:
-  contents: read
+  contents: write
 jobs:
   linters:
     uses: ./.github/workflows/lint.yaml
   tests:
     uses: ./.github/workflows/test.yaml
+  bench:
+    uses: ./.github/workflows/bench.yaml

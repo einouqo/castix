@@ -1,12 +1,36 @@
 package castix
 
 import (
-    "context"
     "sync"
     "testing"
 )
 
+func FuzzCastixCancel(f *testing.F) {
+    f.Add(1)
+
+    f.Fuzz(func(t *testing.T, count int) {
+        x := New[byte]()
+        ch, cancel := x.C()
+        cancel()
+
+        for i := 0; i < count; i++ {
+            cancel()
+        }
+
+        if _, open := <-ch; open {
+            t.Fatal("channel is still open")
+        }
+    })
+}
+
 func TestCastix(t *testing.T) {
+    t.Run("safe cancel", func(t *testing.T) {
+        x := New[byte]()
+        _, cancel := x.C()
+        cancel()
+        cancel()
+    })
+
     t.Run("notify", func(t *testing.T) {
         x := New[byte]()
 
@@ -24,12 +48,11 @@ func TestCastix(t *testing.T) {
 
         for _, test := range tests {
             t.Run(test.name, func(t *testing.T) {
-                chs := make(map[<-chan byte]context.CancelFunc)
+                chs := make(map[<-chan byte]Cancel)
 
                 for i := 0; i < test.count; i++ {
-                    ctx := context.Background()
-                    ctx, cancel := context.WithCancel(ctx)
-                    chs[x.C(ctx)] = cancel
+                    ch, cancel := x.C()
+                    chs[ch] = cancel
                 }
 
                 var wg sync.WaitGroup
@@ -44,7 +67,7 @@ func TestCastix(t *testing.T) {
 
                 for ch, cancel := range chs {
                     wg.Add(1)
-                    go func(ch <-chan byte, cancel context.CancelFunc) {
+                    go func(ch <-chan byte, cancel Cancel) {
                         defer wg.Done()
                         defer cancel()
                         for _, msg := range msgs {
@@ -60,7 +83,6 @@ func TestCastix(t *testing.T) {
                 }
 
                 wg.Wait()
-                x.Notify(0)
                 if c := len(x.subs); c != 0 {
                     t.Errorf("inspection failed (expect 0 subscribers, got %d)", c)
                 }
@@ -74,9 +96,7 @@ func TestCastix(t *testing.T) {
 
         drain, last := []byte{1, 2, 3}, byte(4)
 
-        ctx := context.Background()
-        ctx, cancel := context.WithCancel(ctx)
-        ch := x.C(ctx, WithDrain())
+        ch, cancel := x.C(WithDrain())
 
         for _, msg := range drain {
             x.Notify(msg)
@@ -84,13 +104,64 @@ func TestCastix(t *testing.T) {
         x.Notify(last)
 
         cancel()
-        x.Notify(0)
-
         if msg := <-ch; msg != last {
             t.Errorf("last message should be %d but got %d", last, msg)
         }
         if _, ok := <-ch; ok {
             t.Errorf("subscribe channel should be closed after cancel and read last")
         }
+    })
+}
+
+func BenchmarkCastix(b *testing.B) {
+    b.Run("notify", func(b *testing.B) {
+        benches := []struct {
+            name  string
+            count int
+        }{
+            {name: "no one", count: 0},
+            {name: "one", count: 1},
+            {name: "few", count: 1 << 2},
+            {name: "more", count: 1 << 4},
+            {name: "even more", count: 1 << 8},
+            {name: "a lot", count: 1 << 16},
+        }
+
+        for _, bench := range benches {
+            x := New[int]()
+            cancels := make([]Cancel, 0, bench.count)
+
+            var wg sync.WaitGroup
+            for i := 0; i < bench.count; i++ {
+                ch, cancel := x.C()
+                cancels = append(cancels, cancel)
+
+                wg.Add(1)
+                go func(ch <-chan int) {
+                    defer wg.Done()
+                    for range ch {
+                    }
+                }(ch)
+            }
+
+            b.Run(bench.name, func(b *testing.B) {
+                for i := 0; i < b.N; i++ {
+                    x.Notify(i)
+                }
+            })
+
+            for _, cancel := range cancels {
+                cancel()
+            }
+            wg.Wait()
+        }
+    })
+
+    b.Run("rapid notify", func(b *testing.B) {
+        b.Skip("implement me")
+    })
+
+    b.Run("runtime ops", func(b *testing.B) {
+        b.Skip("implement me")
     })
 }
