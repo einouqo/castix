@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743721082850,
+  "lastUpdate": 1743721689236,
   "repoUrl": "https://github.com/einouqo/castix",
   "entries": {
     "Benchmark": [
@@ -112,6 +112,66 @@ window.BENCHMARK_DATA = {
             "value": 22736070,
             "unit": "ns/op",
             "extra": "48 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "renduhov.d@gmail.com",
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bf8f74aa7fdf6f214eb013ac103d66bf218b371d",
+          "message": "feat: synchronous unsubscribe (#6)",
+          "timestamp": "2025-04-04T01:07:39+02:00",
+          "tree_id": "54a54b8e41c01ee701d0a2e6fb015ac6f931f6fd",
+          "url": "https://github.com/einouqo/castix/commit/bf8f74aa7fdf6f214eb013ac103d66bf218b371d"
+        },
+        "date": 1743721688851,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCastix/notify/no_one",
+            "value": 11.33,
+            "unit": "ns/op",
+            "extra": "100000000 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/notify/one",
+            "value": 172.6,
+            "unit": "ns/op",
+            "extra": "6990186 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/notify/few",
+            "value": 765.4,
+            "unit": "ns/op",
+            "extra": "1609447 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/notify/more",
+            "value": 2496,
+            "unit": "ns/op",
+            "extra": "466094 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/notify/even_more",
+            "value": 35185,
+            "unit": "ns/op",
+            "extra": "34411 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/notify/a_lot",
+            "value": 24666248,
+            "unit": "ns/op",
+            "extra": "46 times\n4 procs"
           }
         ]
       }
