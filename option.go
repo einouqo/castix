@@ -1,21 +1,25 @@
 package castix
 
-type Option interface {
-	apply(*control)
+import "github.com/einouqo/castix/internal/bridge"
+
+type Filter[T any] func(T) bool
+
+var _ = bridge.Filter[struct{}](Filter[struct{}](nil))
+
+type SourceOption = bridge.AttachOption
+
+func WithSourceFilter[T any](f Filter[T]) bridge.AttachFilterOption[T] {
+	return bridge.WithAttachFilter[T](bridge.Filter[T](f))
 }
 
-func WithDrain() Option {
-	return funcOption{
-		fn: func(ctr *control) { ctr.drain = true },
-	}
-}
+type SubscribeOption = bridge.WatchOption
 
-type funcOption struct {
-	fn func(*control)
-}
+var (
+	WithSubscribeBufferSize = bridge.WithWatchBuffSize
+	WithSubscribeDrain      = bridge.WithWatchDrain
+	WithSubscribeSkip       = bridge.WithWatchSkip
+)
 
-var _ Option = (*funcOption)(nil)
-
-func (f funcOption) apply(ctr *control) {
-	f.fn(ctr)
+func WithSubscribeFilter[T any](f Filter[T]) bridge.WatchFilterOption[T] {
+	return bridge.WithWatchFilter[T](bridge.Filter[T](f))
 }
