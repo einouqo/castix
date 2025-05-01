@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746142855598,
+  "lastUpdate": 1746143089275,
   "repoUrl": "https://github.com/einouqo/castix",
   "entries": {
     "Benchmark": [
@@ -216,6 +216,62 @@ window.BENCHMARK_DATA = {
             "value": 3202,
             "unit": "ns/op",
             "extra": "359672 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "committer": {
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "id": "e7f7183c47f687c037edb3f4b89a881fe5c674b5",
+          "message": "draft!:new api",
+          "timestamp": "2025-04-03T23:07:43Z",
+          "url": "https://github.com/einouqo/castix/pull/7/commits/e7f7183c47f687c037edb3f4b89a881fe5c674b5"
+        },
+        "date": 1746143088971,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCastix/Push/no_one",
+            "value": 575.6,
+            "unit": "ns/op",
+            "extra": "1972690 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/one",
+            "value": 840.7,
+            "unit": "ns/op",
+            "extra": "1419160 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/few",
+            "value": 1545,
+            "unit": "ns/op",
+            "extra": "760842 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/more",
+            "value": 3244,
+            "unit": "ns/op",
+            "extra": "362775 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/even_more",
+            "value": 37338,
+            "unit": "ns/op",
+            "extra": "32216 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/a_lot",
+            "value": 25608029,
+            "unit": "ns/op",
+            "extra": "100 times\n4 procs"
           }
         ]
       }
