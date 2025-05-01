@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1743721689236,
+  "lastUpdate": 1746142855598,
   "repoUrl": "https://github.com/einouqo/castix",
   "entries": {
     "Benchmark": [
@@ -172,6 +172,50 @@ window.BENCHMARK_DATA = {
             "value": 24666248,
             "unit": "ns/op",
             "extra": "46 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "committer": {
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "id": "22e0bb099cca4bf8afec383719ee4905c1f2efeb",
+          "message": "draft!:new api",
+          "timestamp": "2025-04-03T23:07:43Z",
+          "url": "https://github.com/einouqo/castix/pull/7/commits/22e0bb099cca4bf8afec383719ee4905c1f2efeb"
+        },
+        "date": 1746142855326,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCastix/Push/no_one",
+            "value": 558.7,
+            "unit": "ns/op",
+            "extra": "1938298 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/one",
+            "value": 840.8,
+            "unit": "ns/op",
+            "extra": "1454074 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/few",
+            "value": 1494,
+            "unit": "ns/op",
+            "extra": "781927 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/more",
+            "value": 3202,
+            "unit": "ns/op",
+            "extra": "359672 times\n4 procs"
           }
         ]
       }
