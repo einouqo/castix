@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1746234243684,
+  "lastUpdate": 1746414826260,
   "repoUrl": "https://github.com/einouqo/castix",
   "entries": {
     "Benchmark": [
@@ -326,6 +326,62 @@ window.BENCHMARK_DATA = {
           {
             "name": "BenchmarkCastix/Push/a_lot",
             "value": 24032239,
+            "unit": "ns/op",
+            "extra": "100 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "committer": {
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "id": "acb33560647e16489d26cd625426f584babe70c0",
+          "message": "draft!:new api",
+          "timestamp": "2025-04-03T23:07:43Z",
+          "url": "https://github.com/einouqo/castix/pull/7/commits/acb33560647e16489d26cd625426f584babe70c0"
+        },
+        "date": 1746414825419,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCastix/Push/no_one",
+            "value": 576.3,
+            "unit": "ns/op",
+            "extra": "2001242 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/one",
+            "value": 865.1,
+            "unit": "ns/op",
+            "extra": "1413333 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/few",
+            "value": 1519,
+            "unit": "ns/op",
+            "extra": "792838 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/more",
+            "value": 3222,
+            "unit": "ns/op",
+            "extra": "364968 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/even_more",
+            "value": 37349,
+            "unit": "ns/op",
+            "extra": "32390 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/Push/a_lot",
+            "value": 26950432,
             "unit": "ns/op",
             "extra": "100 times\n4 procs"
           }
