@@ -18,10 +18,20 @@ func (c *config) init() *config {
   return c
 }
 
+type filter[T any] func(T) bool
+
 func build[T any](done chan struct{}, opts ...option) (chan T, deliver[T]) {
-  cfg := new(config).init()
+  var (
+    f   filter[T]
+    cfg = new(config).init()
+  )
   for _, opt := range opts {
-    opt(cfg)
+    switch opt := opt.(type) {
+    case configue:
+      opt(cfg)
+    case withFilter[T]:
+      f = filter[T](opt)
+    }
   }
 
   ch, dlv := make(chan T, cfg.size), send[T](done)
@@ -33,5 +43,10 @@ func build[T any](done chan struct{}, opts ...option) (chan T, deliver[T]) {
     dlv = skip[T](done)
   }
 
-  return ch, dlv
+  return ch, func(ch chan T, msg T) {
+    if f != nil && !f(msg) {
+      return
+    }
+    dlv(ch, msg)
+  }
 }

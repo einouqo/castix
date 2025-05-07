@@ -21,8 +21,8 @@ func (o *Output[T]) Pass(msg T) { o.emit(msg) }
 
 func (o *Output[T]) Watch(options ...bridge.OutputWatchOption) (<-chan T, bridge.Leave) {
   opts := make([]option, 0, len(options))
-  for _, option := range options {
-    switch opt := option.(type) {
+  for _, opt := range options {
+    switch opt := opt.(type) {
     case bridge.WatchBufferSizeOption:
       opts = append(opts, withBuffSize(int(opt)))
     case bridge.WatchSkipOption:
@@ -30,8 +30,7 @@ func (o *Output[T]) Watch(options ...bridge.OutputWatchOption) (<-chan T, bridge
     case bridge.WatchDrainOption:
       opts = append(opts, withStrategy(draining))
     case bridge.WatchFilterOption[T]:
-      // TODO: implement me
-      panic("implement me")
+      opts = append(opts, withFilter[T](opt))
     }
   }
   return o.watch(opts...)
