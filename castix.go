@@ -1,64 +1,40 @@
 package castix
 
-import "sync"
+import (
+  "github.com/einouqo/castix/internal/bridge"
+	"github.com/einouqo/castix/internal/emit"
+	"github.com/einouqo/castix/internal/mux"
+)
 
-type control struct {
-    drain bool
+type Leave = bridge.Leave
+
+type Convert[IN, OUT any] func(IN) OUT
+
+var _ = bridge.Convert[struct{}, struct{}](Convert[struct{}, struct{}](nil))
+
+func Pass[T any](in T) T { return in }
+
+var (
+	_ Convert[struct{}, struct{}] = Pass[struct{}]
+)
+
+type Castix[IN, OUT any] struct {
+	bridge *bridge.Bridge[IN, OUT]
 }
 
-type Castix[T any] struct {
-    mu   sync.RWMutex
-    subs map[chan T]control
+func New[IN, OUT any](cv Convert[IN, OUT]) *Castix[IN, OUT] {
+	return &Castix[IN, OUT]{
+		bridge: bridge.New[IN, OUT](
+			mux.NewInput[IN](), emit.NewOutput[OUT](),
+			bridge.Convert[IN, OUT](cv),
+		),
+	}
 }
 
-func New[T any]() *Castix[T] {
-    return &Castix[T]{
-        subs: make(map[chan T]control),
-    }
+func (x Castix[IN, OUT]) Source(ch <-chan IN, opts ...SourceOption) Leave {
+	return x.bridge.Attach(ch, opts...)
 }
 
-type Cancel func()
-
-func (x *Castix[T]) C(opts ...Option) (<-chan T, Cancel) {
-    ch := make(chan T, 1)
-    ctr := control{}
-    for _, opt := range opts {
-        opt.apply(&ctr)
-    }
-
-    x.mu.Lock()
-    x.subs[ch] = ctr
-    x.mu.Unlock()
-
-    return ch, func() {
-        x.mu.Lock()
-        defer x.mu.Unlock()
-        if _, hit := x.subs[ch]; hit {
-            close(ch)
-            delete(x.subs, ch)
-        }
-    }
-}
-
-func (x *Castix[T]) Notify(msg T) {
-    x.mu.RLock()
-    defer x.mu.RUnlock()
-    for ch, ctr := range x.subs {
-        if !ctr.drain {
-            ch <- msg
-            continue
-        }
-
-        select {
-        case ch <- msg:
-            continue
-        default:
-        }
-
-        select {
-        case ch <- msg:
-        case <-ch:
-            ch <- msg
-        }
-    }
+func (x Castix[IN, OUT]) Subscribe(opts ...SubscribeOption) (<-chan OUT, Leave) {
+	return x.bridge.Watch(opts...)
 }
