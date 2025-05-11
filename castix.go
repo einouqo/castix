@@ -1,7 +1,7 @@
 package castix
 
 import (
-	"github.com/einouqo/castix/internal/bridge"
+  "github.com/einouqo/castix/internal/bridge"
 	"github.com/einouqo/castix/internal/emit"
 	"github.com/einouqo/castix/internal/mux"
 )
@@ -19,7 +19,7 @@ var (
 )
 
 type Castix[IN, OUT any] struct {
-	bridge *bridge.Brigde[IN, OUT]
+	bridge *bridge.Bridge[IN, OUT]
 }
 
 func New[IN, OUT any](cv Convert[IN, OUT]) *Castix[IN, OUT] {

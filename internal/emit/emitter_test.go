@@ -124,7 +124,7 @@ func TestEmitter(t *testing.T) {
             e.emit(msg)
           }
         }()
-        
+
         for i, msg := range test.expect {
           r, ok := <-ch
           if !ok {

@@ -34,7 +34,7 @@ func build[T any](done <-chan struct{}, opts ...option) (chan T, deliver[T]) {
   s := new(settings[T]).init()
   for _, opt := range opts {
     switch opt := opt.(type) {
-    case configue:
+    case configure:
       opt(&s.config)
     case setup[T]:
       opt(s)

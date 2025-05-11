@@ -1,14 +1,14 @@
 package emit
 
-type configue func(*config)
+type configure func(*config)
 
 var (
-  _ option = configue(nil)
+  _ option = configure(nil)
 )
 
-func (configue) itsOption() {}
+func (configure) itsOption() {}
 
-func withBuffSize(size int) configue {
+func withBuffSize(size int) configure {
   return func(c *config) {
     if size >= 1 {
       c.size = size
@@ -16,7 +16,7 @@ func withBuffSize(size int) configue {
   }
 }
 
-func withStrategy(s strategy) configue {
+func withStrategy(s strategy) configure {
   return func(c *config) { c.strat = s }
 }
 
