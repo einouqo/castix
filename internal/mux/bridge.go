@@ -17,25 +17,17 @@ func NewInput[T any]() *Input[T] {
   return new(Input[T]).init()
 }
 
-func (in *Input[T]) Attach(ch <-chan T, options ...bridge.InputAttachOption) bridge.Leave {
-  var (
-    f bridge.Filter[T]
-    h bridge.Handle[T]
-  )
-  for _, option := range options {
-    switch opt := option.(type) {
+func (in *Input[T]) Attach(ch <-chan T, h bridge.Handle[T], opts ...bridge.InputAttachOption) bridge.Leave {
+  var f bridge.Filter[T]
+  for _, opt := range opts {
+    switch opt := opt.(type) {
     case bridge.AttachFilterOption[T]:
       f = bridge.Filter[T](opt)
-    case bridge.AttachHandleOption[T]:
-      h = bridge.Handle[T](opt)
     }
   }
 
   return in.attach(ch, func(msg T) {
     if f != nil && !f(msg) {
-      return
-    }
-    if h == nil {
       return
     }
     h(msg)

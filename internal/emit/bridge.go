@@ -30,7 +30,7 @@ func (o *Output[T]) Watch(options ...bridge.OutputWatchOption) (<-chan T, bridge
     case bridge.WatchDrainOption:
       opts = append(opts, withStrategy(draining))
     case bridge.WatchFilterOption[T]:
-      opts = append(opts, withFilter[T](opt))
+      opts = append(opts, withFilter[T](filter[T](opt)))
     }
   }
   return o.watch(opts...)

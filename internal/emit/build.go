@@ -9,8 +9,8 @@ const (
 )
 
 type config struct {
-  size     int
-  strategy strategy
+  size  int
+  strat strategy
 }
 
 func (c *config) init() *config {
@@ -20,23 +20,30 @@ func (c *config) init() *config {
 
 type filter[T any] func(T) bool
 
-func build[T any](done chan struct{}, opts ...option) (chan T, deliver[T]) {
-  var (
-    f   filter[T]
-    cfg = new(config).init()
-  )
+type settings[T any] struct {
+  config
+  filter[T]
+}
+
+func (s *settings[T]) init() *settings[T] {
+  s.config.init()
+  return s
+}
+
+func build[T any](done <-chan struct{}, opts ...option) (chan T, deliver[T]) {
+  s := new(settings[T]).init()
   for _, opt := range opts {
     switch opt := opt.(type) {
     case configue:
-      opt(cfg)
-    case withFilter[T]:
-      f = filter[T](opt)
+      opt(&s.config)
+    case setup[T]:
+      opt(s)
     }
   }
 
-  ch, dlv := make(chan T, cfg.size), send[T](done)
+  ch, dlv := make(chan T, s.size), send[T](done)
 
-  switch cfg.strategy {
+  switch s.strat {
   case draining:
     dlv = drain[T](done)
   case skipping:
@@ -44,7 +51,7 @@ func build[T any](done chan struct{}, opts ...option) (chan T, deliver[T]) {
   }
 
   return ch, func(ch chan T, msg T) {
-    if f != nil && !f(msg) {
+    if s.filter != nil && !s.filter(msg) {
       return
     }
     dlv(ch, msg)

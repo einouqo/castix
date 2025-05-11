@@ -22,8 +22,7 @@ func (b Brigde[IN, OUT]) Attach(ch <-chan IN, options ...AttachOption) Leave {
 	for _, option := range options {
 		opts = append(opts, option)
 	}
-	opts = append(opts, WithAttachHandle(func(in IN) { b.out.Pass(b.cv(in)) }))
-	return b.in.Attach(ch, opts...)
+	return b.in.Attach(ch, func(in IN) { b.out.Pass(b.cv(in)) }, opts...)
 }
 
 func (b Brigde[IN, OUT]) Watch(options ...WatchOption) (<-chan OUT, Leave) {
