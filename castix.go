@@ -1,7 +1,7 @@
 package castix
 
 import (
-  "github.com/einouqo/castix/internal/bridge"
+	"github.com/einouqo/castix/internal/bridge"
 	"github.com/einouqo/castix/internal/emit"
 	"github.com/einouqo/castix/internal/mux"
 )

@@ -9,8 +9,8 @@ const (
 )
 
 type config struct {
-  size  int
-  strat strategy
+  size     int
+  strategy strategy
 }
 
 func (c *config) init() *config {
@@ -43,7 +43,7 @@ func build[T any](done <-chan struct{}, opts ...option) (chan T, deliver[T]) {
 
   ch, dlv := make(chan T, s.size), send[T](done)
 
-  switch s.strat {
+  switch s.strategy {
   case draining:
     dlv = drain[T](done)
   case skipping:
