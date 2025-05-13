@@ -1,8 +1,8 @@
 package bridge
 
 type Output[T any] interface {
-  Pass(T)
-  Watch(...OutputWatchOption) (<-chan T, Leave)
+	Pass(T)
+	Watch(...OutputWatchOption) (<-chan T, Leave)
 }
 
 type WatchBufferSizeOption int
@@ -11,7 +11,7 @@ func (WatchBufferSizeOption) itsOutputWatchOption() {}
 func (WatchBufferSizeOption) itsWatchOption()       {}
 
 func WithWatchBuffSize(size int) WatchBufferSizeOption {
-  return WatchBufferSizeOption(size)
+	return WatchBufferSizeOption(size)
 }
 
 type WatchDrainOption struct{}
@@ -34,15 +34,15 @@ func (WatchFilterOption[T]) itsOutputWatchOption() {}
 func (WatchFilterOption[T]) itsWatchOption()       {}
 
 func WithWatchFilter[T any](f Filter[T]) WatchFilterOption[T] {
-  return WatchFilterOption[T](f)
+	return WatchFilterOption[T](f)
 }
 
 type OutputWatchOption interface {
-  itsOutputWatchOption()
+	itsOutputWatchOption()
 }
 
 var (
-  _ OutputWatchOption = (*WatchBufferSizeOption)(nil)
-  _ OutputWatchOption = (*WatchDrainOption)(nil)
-  _ OutputWatchOption = (*WatchSkipOption)(nil)
+	_ OutputWatchOption = (*WatchBufferSizeOption)(nil)
+	_ OutputWatchOption = (*WatchDrainOption)(nil)
+	_ OutputWatchOption = (*WatchSkipOption)(nil)
 )
