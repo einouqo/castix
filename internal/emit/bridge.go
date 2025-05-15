@@ -4,9 +4,7 @@ import "github.com/einouqo/castix/internal/bridge"
 
 type Output[T any] struct{ emitter[T] }
 
-var (
-	_ bridge.Output[struct{}] = (*Output[struct{}])(nil)
-)
+var _ bridge.Output[struct{}] = (*Output[struct{}])(nil)
 
 func (o *Output[T]) init() *Output[T] {
 	o.emitter.init()

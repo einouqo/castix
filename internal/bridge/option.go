@@ -5,9 +5,7 @@ type AttachOption interface {
 	itsAttachOption()
 }
 
-var (
-	_ AttachOption = (*AttachFilterOption[struct{}])(nil)
-)
+var _ AttachOption = (*AttachFilterOption[struct{}])(nil)
 
 type WatchOption interface {
 	OutputWatchOption
