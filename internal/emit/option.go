@@ -2,9 +2,7 @@ package emit
 
 type configure func(*config)
 
-var (
-	_ option = configure(nil)
-)
+var _ option = configure(nil)
 
 func (configure) itsOption() {}
 
@@ -22,9 +20,7 @@ func withStrategy(s strategy) configure {
 
 type setup[T any] func(*settings[T])
 
-var (
-	_ option = setup[struct{}](nil)
-)
+var _ option = setup[struct{}](nil)
 
 func (s setup[T]) itsOption() {}
 

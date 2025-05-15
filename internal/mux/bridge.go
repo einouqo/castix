@@ -4,9 +4,7 @@ import "github.com/einouqo/castix/internal/bridge"
 
 type Input[T any] struct{ mux[T] }
 
-var (
-	_ bridge.Input[struct{}] = (*Input[struct{}])(nil)
-)
+var _ bridge.Input[struct{}] = (*Input[struct{}])(nil)
 
 func (in *Input[T]) init() *Input[T] {
 	in.mux.init()

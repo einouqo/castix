@@ -16,6 +16,4 @@ type InputAttachOption interface {
 	itsInputAttachOption()
 }
 
-var (
-	_ InputAttachOption = (*AttachFilterOption[struct{}])(nil)
-)
+var _ InputAttachOption = (*AttachFilterOption[struct{}])(nil)
