@@ -1,6 +1,6 @@
 package bridge
 
-type Leave func()
+type Leave = func()
 
 type Convert[IN, OUT any] func(IN) OUT
 

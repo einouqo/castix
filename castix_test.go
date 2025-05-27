@@ -25,11 +25,24 @@ func FuzzCastixCancel(f *testing.F) {
 }
 
 func BenchmarkCastix(b *testing.B) {
+	variants := []struct {
+		name string
+		make func() *Castix[int, int]
+	}{
+		{
+			name: "goroutine",
+			make: func() *Castix[int, int] { return New[int, int](Pass[int], UseGoroutine()) },
+		},
+		{
+			name: "reflection",
+			make: func() *Castix[int, int] { return New[int, int](Pass[int], UseReflection()) },
+		},
+	}
+
 	type run func(b *testing.B, n int)
 	type runner func(b *testing.B, f run)
 
 	runners := []runner{
-		func(b *testing.B, f run) { b.Run("no one", func(b *testing.B) { f(b, 0) }) },
 		func(b *testing.B, f run) { b.Run("one", func(b *testing.B) { f(b, 1) }) },
 		func(b *testing.B, f run) { b.Run("few", func(b *testing.B) { f(b, 1<<2) }) },
 		func(b *testing.B, f run) { b.Run("more", func(b *testing.B) { f(b, 1<<4) }) },
@@ -37,20 +50,85 @@ func BenchmarkCastix(b *testing.B) {
 		func(b *testing.B, f run) { b.Run("a lot", func(b *testing.B) { f(b, 1<<10) }) },
 	}
 
-	b.Run("inputs", func(b *testing.B) {
-		for _, rr := range runners {
-			rr(b, func(b *testing.B, n int) {
-				x := New[int, int](Pass[int])
+	for _, variant := range variants {
+		b.Run(variant.name, func(b *testing.B) {
 
-				ctx := context.Background()
-				ctx, cancel := context.WithCancel(ctx)
+			b.Run("inputs", func(b *testing.B) {
+				for _, rr := range runners {
+					rr(b, func(b *testing.B, n int) {
+						x := variant.make()
 
-				wg := sync.WaitGroup{}
+						ctx := context.Background()
+						ctx, cancel := context.WithCancel(ctx)
 
-				for i := 0; i < n; i++ {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
+						wg := sync.WaitGroup{}
+
+						for i := 0; i < n; i++ {
+							wg.Add(1)
+							go func() {
+								defer wg.Done()
+
+								in := make(chan int)
+								defer close(in)
+
+								leave := x.Source(in)
+								defer leave()
+
+								for i := 0; i <= b.N; i++ {
+									in <- i
+								}
+							}()
+						}
+
+						done := make(chan struct{})
+						go func(ctx context.Context) {
+							defer close(done)
+							ch, leave := x.Subscribe()
+							defer leave()
+
+							for {
+								select {
+								case <-ch:
+								case <-ctx.Done():
+									return
+								}
+							}
+						}(ctx)
+
+						wg.Wait()
+						cancel()
+						<-done
+					})
+				}
+			})
+
+			b.Run("outputs", func(b *testing.B) {
+				for _, rr := range runners {
+					rr(b, func(b *testing.B, n int) {
+						x := variant.make()
+
+						ctx := context.Background()
+						ctx, cancel := context.WithCancel(ctx)
+
+						wg := sync.WaitGroup{}
+
+						for i := 0; i < n; i++ {
+							wg.Add(1)
+							go func(ctx context.Context) {
+								defer wg.Done()
+
+								ch, leave := x.Subscribe()
+								defer leave()
+
+								for {
+									select {
+									case <-ch:
+									case <-ctx.Done():
+										return
+									}
+								}
+							}(ctx)
+						}
 
 						in := make(chan int)
 						defer close(in)
@@ -58,129 +136,69 @@ func BenchmarkCastix(b *testing.B) {
 						leave := x.Source(in)
 						defer leave()
 
-						for i := 0; i <= b.N; i++ {
+						for i := 0; i < b.N; i++ {
 							in <- i
 						}
-					}()
+
+						cancel()
+						wg.Wait()
+					})
 				}
-
-				done := make(chan struct{})
-				go func(ctx context.Context) {
-					defer close(done)
-					ch, leave := x.Subscribe()
-					defer leave()
-
-					for {
-						select {
-						case <-ch:
-						case <-ctx.Done():
-							return
-						}
-					}
-				}(ctx)
-
-				wg.Wait()
-				cancel()
-				<-done
 			})
-		}
-	})
 
-	b.Run("outputs", func(b *testing.B) {
-		for _, rr := range runners {
-			rr(b, func(b *testing.B, n int) {
-				x := New[int, int](Pass[int])
+			b.Run("input-output", func(b *testing.B) {
+				for _, runner := range runners {
+					runner(b, func(b *testing.B, n int) {
+						x := variant.make()
 
-				ctx := context.Background()
-				ctx, cancel := context.WithCancel(ctx)
+						ctx := context.Background()
+						ctx, cancel := context.WithCancel(ctx)
 
-				wg := sync.WaitGroup{}
+						og := sync.WaitGroup{}
 
-				for i := 0; i < n; i++ {
-					wg.Add(1)
-					go func(ctx context.Context) {
-						defer wg.Done()
+						for i := 0; i < n; i++ {
+							og.Add(1)
+							go func(ctx context.Context) {
+								defer og.Done()
 
-						ch, leave := x.Subscribe()
-						defer leave()
+								ch, leave := x.Subscribe()
+								defer leave()
 
-						for {
-							select {
-							case <-ch:
-							case <-ctx.Done():
-								return
-							}
+								for {
+									select {
+									case <-ch:
+									case <-ctx.Done():
+										return
+									}
+								}
+							}(ctx)
 						}
-					}(ctx)
+
+						sg := sync.WaitGroup{}
+
+						for i := 0; i <= n; i++ {
+							sg.Add(1)
+							go func() {
+								defer sg.Done()
+
+								in := make(chan int)
+								defer close(in)
+
+								leave := x.Source(in)
+								defer leave()
+
+								for i := 0; i <= b.N; i++ {
+									in <- i
+								}
+							}()
+						}
+
+						sg.Wait()
+						cancel()
+						og.Wait()
+					})
 				}
-
-				in := make(chan int)
-				defer close(in)
-
-				leave := x.Source(in)
-				defer leave()
-
-				for i := 0; i < b.N; i++ {
-					in <- i
-				}
-
-				cancel()
-				wg.Wait()
 			})
-		}
-	})
-
-	b.Run("input-output", func(b *testing.B) {
-		for _, runner := range runners {
-			runner(b, func(b *testing.B, n int) {
-				x := New[int, int](Pass[int])
-
-				ctx := context.Background()
-				ctx, cancel := context.WithCancel(ctx)
-
-				og := sync.WaitGroup{}
-
-				for i := 0; i < n; i++ {
-					og.Add(1)
-					go func(ctx context.Context) {
-						defer og.Done()
-
-						ch, leave := x.Subscribe()
-						defer leave()
-
-						for {
-							select {
-							case <-ch:
-							case <-ctx.Done():
-								return
-							}
-						}
-					}(ctx)
-				}
-
-				sg := sync.WaitGroup{}
-
-				for i := 0; i <= n; i++ {
-					sg.Add(1)
-					go func() {
-						defer sg.Done()
-
-						in := make(chan int)
-						defer close(in)
-
-						leave := x.Source(in)
-						defer leave()
-
-						for i := 0; i <= b.N; i++ {
-							in <- i
-						}
-					}()
-				}
-
-				sg.Wait()
-				cancel()
-				og.Wait()
-			})
-		}
-	})
+		})
+	}
 }

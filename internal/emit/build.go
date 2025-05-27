@@ -50,10 +50,10 @@ func build[T any](done <-chan struct{}, opts ...option) (chan T, deliver[T]) {
 		dlv = skip[T](done)
 	}
 
-	return ch, func(ch chan T, msg T) {
-		if s.filter != nil && !s.filter(msg) {
+	return ch, func(ch chan T, v T) {
+		if s.filter != nil && !s.filter(v) {
 			return
 		}
-		dlv(ch, msg)
+		dlv(ch, v)
 	}
 }
