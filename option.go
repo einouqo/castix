@@ -1,6 +1,56 @@
 package castix
 
-import "github.com/einouqo/castix/internal/bridge"
+import (
+	"github.com/einouqo/castix/internal/bridge"
+	"github.com/einouqo/castix/internal/mux"
+)
+
+type config struct {
+	input []mux.InputOption
+}
+
+func (c *config) init() *config {
+	c.input = make([]mux.InputOption, 0)
+	return c
+}
+
+// Option defines a configuration option that can be applied when creating
+// a new Castix instance using New.
+type Option interface {
+	apply(*config)
+}
+
+// UseGoroutine returns an Option that configures Castix to use goroutine-based
+// multiplexing for handling its input channels. This is generally the default behavior
+// if no specific input handling option is provided. In this mode, each attached
+// input channel is monitored by a dedicated goroutine.
+func UseGoroutine() Option {
+	return funcOption{f: func(cfg *config) {
+		cfg.input = append(cfg.input, mux.InputUseGoroutine())
+	}}
+}
+
+// UseReflection returns an Option that configures Castix to use reflection-based
+// multiplexing (via reflect.Select) for handling its input channels.
+// This approach is recommended when dealing with a large number of input channels
+// that are expected to receive messages infrequently. It is particularly well-suited
+// for scenarios where conserving goroutine resources across many potentially idle
+// channels is beneficial, as it uses a single goroutine to manage all inputs.
+// For scenarios with fewer channels experiencing high-throughput and frequent messages,
+// goroutine-based multiplexing (see UseGoroutine) may offer better performance.
+func UseReflection() Option {
+	return funcOption{f: func(cfg *config) {
+		cfg.input = append(cfg.input, mux.InputUseReflection())
+	}}
+}
+
+type funcOption struct {
+	f func(*config)
+}
+
+var _ Option = (*funcOption)(nil)
+
+func (o funcOption) apply(cfg *config) { o.f(cfg) }
 
 // Filter defines a function signature for a predicate that determines
 // whether a message of type T should be processed or discarded/skipped.

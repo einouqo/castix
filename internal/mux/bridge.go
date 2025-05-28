@@ -2,17 +2,26 @@ package mux
 
 import "github.com/einouqo/castix/internal/bridge"
 
-type Input[T any] struct{ mux[T] }
+type InputOption option
+
+func InputUseGoroutine() InputOption {
+	return InputOption(use(goroutine))
+}
+
+func InputUseReflection() InputOption {
+	return InputOption(use(reflection))
+}
+
+type Input[T any] struct{ x mux[T] }
 
 var _ bridge.Input[struct{}] = (*Input[struct{}])(nil)
 
-func (in *Input[T]) init() *Input[T] {
-	in.mux.init()
-	return in
-}
-
-func NewInput[T any]() *Input[T] {
-	return new(Input[T]).init()
+func NewInput[T any](options ...InputOption) *Input[T] {
+	opts := make([]option, 0, len(options))
+	for _, opt := range options {
+		opts = append(opts, option(opt))
+	}
+	return &Input[T]{x: create[T](opts...)}
 }
 
 func (in *Input[T]) Attach(ch <-chan T, h bridge.Handle[T], opts ...bridge.InputAttachOption) bridge.Leave {
@@ -24,10 +33,10 @@ func (in *Input[T]) Attach(ch <-chan T, h bridge.Handle[T], opts ...bridge.Input
 		}
 	}
 
-	return in.attach(ch, func(msg T) {
-		if f != nil && !f(msg) {
+	return in.x.attach(ch, func(v T) {
+		if f != nil && !f(v) {
 			return
 		}
-		h(msg)
+		h(v)
 	})
 }

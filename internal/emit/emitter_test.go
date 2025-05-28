@@ -9,7 +9,7 @@ func TestEmitter(t *testing.T) {
 	t.Run("emit", func(t *testing.T) {
 		e := new(emitter[byte]).init()
 
-		msgs := []byte{1, 2, 3}
+		vs := []byte{1, 2, 3}
 
 		tests := []struct {
 			name  string
@@ -35,8 +35,8 @@ func TestEmitter(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					for _, msg := range msgs {
-						e.emit(msg)
+					for _, v := range vs {
+						e.emit(v)
 					}
 				}()
 
@@ -45,13 +45,13 @@ func TestEmitter(t *testing.T) {
 					go func(ch <-chan byte, stop func()) {
 						defer wg.Done()
 						defer stop()
-						for _, msg := range msgs {
+						for _, v := range vs {
 							r, ok := <-ch
 							if !ok {
 								t.Error("channel is closed")
 							}
-							if r != msg {
-								t.Errorf("received wrong message (want: %d, got: %d)", msg, r)
+							if r != v {
+								t.Errorf("received wrong message (want: %d, got: %d)", v, r)
 							}
 						}
 					}(ch, stop)
@@ -68,7 +68,7 @@ func TestEmitter(t *testing.T) {
 	t.Run("strategy", func(t *testing.T) {
 		e := new(emitter[byte]).init()
 
-		msgs := []byte{1, 2, 3}
+		vs := []byte{1, 2, 3}
 
 		tests := []struct {
 			name     string
@@ -81,15 +81,15 @@ func TestEmitter(t *testing.T) {
 
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
-				ch, stop := e.watch(withStrategy(test.strategy))
+				ch, stop := e.watch(use(test.strategy))
 
-				for _, msg := range msgs {
-					e.emit(msg)
+				for _, v := range vs {
+					e.emit(v)
 				}
 
 				stop()
-				if msg := <-ch; msg != test.expect {
-					t.Errorf("message should be %d but got %d", test.expect, msg)
+				if v := <-ch; v != test.expect {
+					t.Errorf("message should be %d but got %d", test.expect, v)
 				}
 				if _, ok := <-ch; ok {
 					t.Errorf("subscribe channel should be closed after stop and read last")
@@ -101,7 +101,7 @@ func TestEmitter(t *testing.T) {
 	t.Run("filter", func(t *testing.T) {
 		e := new(emitter[int]).init()
 
-		msgs := []int{-3, -2, -1, 0, 1, 2, 3}
+		vs := []int{-3, -2, -1, 0, 1, 2, 3}
 
 		tests := []struct {
 			name   string
@@ -114,24 +114,24 @@ func TestEmitter(t *testing.T) {
 
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
-				ch, stop := e.watch(withFilter(test.filter))
+				ch, stop := e.watch(filtrate(test.filter))
 				defer stop()
 
 				done := make(chan struct{})
 				go func() {
 					defer close(done)
-					for _, msg := range msgs {
-						e.emit(msg)
+					for _, v := range vs {
+						e.emit(v)
 					}
 				}()
 
-				for i, msg := range test.expect {
+				for i, v := range test.expect {
 					r, ok := <-ch
 					if !ok {
 						t.Error("channel is closed")
 					}
-					if r != msg {
-						t.Errorf("received wrong message (iteration: %d, want: %d, got: %d)", i, msg, r)
+					if r != v {
+						t.Errorf("received wrong message (iteration: %d, want: %d, got: %d)", i, v, r)
 					}
 				}
 

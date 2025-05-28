@@ -17,11 +17,11 @@ func (e *emitter[T]) init() *emitter[T] {
 	return e
 }
 
-func (e *emitter[T]) emit(msg T) {
+func (e *emitter[T]) emit(v T) {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
 	for out, dlv := range e.outs {
-		dlv(out, msg)
+		dlv(out, v)
 	}
 }
 

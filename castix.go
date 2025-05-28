@@ -22,7 +22,7 @@ func Pass[T any](in T) T { return in }
 
 var _ Convert[struct{}, struct{}] = Pass[struct{}]
 
-// Castix provides a flexible and type-safe way to manage message streams.
+// Castix provides a flexible way to manage message streams.
 // It acts as a multiplexer, allowing multiple message producers (sources)
 // to broadcast messages to multiple consumers (subscribers).
 // Castix also handles type conversion between the source message type (IN)
@@ -35,10 +35,15 @@ type Castix[IN, OUT any] struct {
 // It requires a Convert function `cv` that defines how messages of type IN
 // are transformed into messages of type OUT. If no transformation is needed
 // (IN and OUT are the same type), the Pass function can be used.
-func New[IN, OUT any](cv Convert[IN, OUT]) *Castix[IN, OUT] {
+func New[IN, OUT any](cv Convert[IN, OUT], opts ...Option) *Castix[IN, OUT] {
+	cfg := new(config).init()
+	for _, opt := range opts {
+		opt.apply(cfg)
+	}
+
 	return &Castix[IN, OUT]{
 		bridge: bridge.New[IN, OUT](
-			mux.NewInput[IN](), emit.NewOutput[OUT](),
+			mux.NewInput[IN](cfg.input...), emit.NewOutput[OUT](),
 			bridge.Convert[IN, OUT](cv),
 		),
 	}
