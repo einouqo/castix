@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1748390402989,
+  "lastUpdate": 1748390527709,
   "repoUrl": "https://github.com/einouqo/castix",
   "entries": {
     "Benchmark": [
@@ -998,6 +998,210 @@ window.BENCHMARK_DATA = {
           {
             "name": "BenchmarkCastix/reflection/input-output/a_lot",
             "value": 574485914,
+            "unit": "ns/op",
+            "extra": "2 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "renduhov.d@gmail.com",
+            "name": "einouqo",
+            "username": "einouqo"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "80e9e17c0f70222da8fed76b9ec2a59b454cda7d",
+          "message": "feat: new goroutine mux (#11)",
+          "timestamp": "2025-05-28T02:00:56+02:00",
+          "tree_id": "215722b61cc1853b6c06c9daae7dd5c23c834397",
+          "url": "https://github.com/einouqo/castix/commit/80e9e17c0f70222da8fed76b9ec2a59b454cda7d"
+        },
+        "date": 1748390527376,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkCastix/goroutine/inputs/one",
+            "value": 667,
+            "unit": "ns/op",
+            "extra": "1747333 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/inputs/few",
+            "value": 2795,
+            "unit": "ns/op",
+            "extra": "421806 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/inputs/more",
+            "value": 11641,
+            "unit": "ns/op",
+            "extra": "102841 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/inputs/even_more",
+            "value": 200669,
+            "unit": "ns/op",
+            "extra": "5541 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/inputs/a_lot",
+            "value": 812324,
+            "unit": "ns/op",
+            "extra": "1441 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/outputs/one",
+            "value": 668.3,
+            "unit": "ns/op",
+            "extra": "1793005 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/outputs/few",
+            "value": 1758,
+            "unit": "ns/op",
+            "extra": "644874 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/outputs/more",
+            "value": 5541,
+            "unit": "ns/op",
+            "extra": "211236 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/outputs/even_more",
+            "value": 81029,
+            "unit": "ns/op",
+            "extra": "14845 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/outputs/a_lot",
+            "value": 304691,
+            "unit": "ns/op",
+            "extra": "5752 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/input-output/one",
+            "value": 1334,
+            "unit": "ns/op",
+            "extra": "867573 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/input-output/few",
+            "value": 8835,
+            "unit": "ns/op",
+            "extra": "129837 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/input-output/more",
+            "value": 89567,
+            "unit": "ns/op",
+            "extra": "13527 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/input-output/even_more",
+            "value": 11176941,
+            "unit": "ns/op",
+            "extra": "146 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/goroutine/input-output/a_lot",
+            "value": 252499169,
+            "unit": "ns/op",
+            "extra": "4 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/inputs/one",
+            "value": 944.2,
+            "unit": "ns/op",
+            "extra": "1278570 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/inputs/few",
+            "value": 4982,
+            "unit": "ns/op",
+            "extra": "233029 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/inputs/more",
+            "value": 39821,
+            "unit": "ns/op",
+            "extra": "30652 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/inputs/even_more",
+            "value": 7117234,
+            "unit": "ns/op",
+            "extra": "204 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/inputs/a_lot",
+            "value": 89931983,
+            "unit": "ns/op",
+            "extra": "12 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/outputs/one",
+            "value": 947.3,
+            "unit": "ns/op",
+            "extra": "1267963 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/outputs/few",
+            "value": 2058,
+            "unit": "ns/op",
+            "extra": "581701 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/outputs/more",
+            "value": 5769,
+            "unit": "ns/op",
+            "extra": "204507 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/outputs/even_more",
+            "value": 82942,
+            "unit": "ns/op",
+            "extra": "14424 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/outputs/a_lot",
+            "value": 304569,
+            "unit": "ns/op",
+            "extra": "8992 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/input-output/one",
+            "value": 2014,
+            "unit": "ns/op",
+            "extra": "573974 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/input-output/few",
+            "value": 12361,
+            "unit": "ns/op",
+            "extra": "96800 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/input-output/more",
+            "value": 121244,
+            "unit": "ns/op",
+            "extra": "8971 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/input-output/even_more",
+            "value": 24881191,
+            "unit": "ns/op",
+            "extra": "48 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkCastix/reflection/input-output/a_lot",
+            "value": 584222795,
             "unit": "ns/op",
             "extra": "2 times\n4 procs"
           }
